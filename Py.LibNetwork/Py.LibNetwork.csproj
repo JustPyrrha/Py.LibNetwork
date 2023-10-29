@@ -14,16 +14,19 @@
         <Reference Include="UnityEngine.CoreModule">
             <HintPath>$(DemeoDir)\demeo_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
+        <Reference Include="ResolutionGames.Singleton">
+            <HintPath>$(DemeoDir)\demeo_Data\Managed\ResolutionGames.Singleton.dll</HintPath>
+        </Reference>
         
-        <!-- Networking Dependencies -->
+        <!-- Photon Networking Dependencies -->
+        <Reference Include="Photon3Unity3D">
+            <HintPath>$(DemeoDir)\demeo_Data\Managed\Photon3Unity3D.dll</HintPath>
+        </Reference>
         <Reference Include="PhotonRealtime">
             <HintPath>$(DemeoDir)\demeo_Data\Managed\PhotonRealtime.dll</HintPath>
         </Reference>
         <Reference Include="PhotonUnityNetworking">
             <HintPath>$(DemeoDir)\demeo_Data\Managed\PhotonUnityNetworking.dll</HintPath>
-        </Reference>
-        <Reference Include="PhotonUnityNetworking.Utilities">
-            <HintPath>$(DemeoDir)\demeo_Data\Managed\PhotonUnityNetworking.Utilities.dll</HintPath>
         </Reference>
     </ItemGroup>
 
