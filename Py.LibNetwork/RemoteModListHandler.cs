@@ -12,8 +12,9 @@ namespace Py.LibNetwork
     /// </summary>
     public class RemoteModListHandler
     {
-        private const string ModListChannelPrefix = "Py.LibNetwork/ModList/";
-        private const int ModListChannelVersion = 0;
+        private const string ChannelPrefix = "Py.LibNetwork/ModList/";
+        // bump version here when updating (de)serializers
+        private const int ProtocolVersion = 0;
 
         public static Dictionary<PlayerId, List<ModdingAPI.ModInformation>> RemoteModLists = new();
         public event Action<PlayerId, List<ModdingAPI.ModInformation>> ModListReceived;
@@ -66,30 +67,31 @@ namespace Py.LibNetwork
         private void SendModList(PlayerId target, List<ModdingAPI.ModInformation> modList)
         {
             var data = SerializeModList(modList);
-            ModNetwork.Instance.SendChannelMessage(ModListChannelPrefix + ModListChannelVersion, data, target);
+            ModNetwork.Instance.SendMessage(ChannelPrefix + ProtocolVersion, data, target);
         }
 
         private void BroadcastModList(List<ModdingAPI.ModInformation> modList)
         {
             var data = SerializeModList(modList);
-            ModNetwork.Instance.BroadcastChannelMessage(ModListChannelPrefix + ModListChannelVersion, data);
+            ModNetwork.Instance.BroadcastMessage(ChannelPrefix + ProtocolVersion, data);
         }
 
         private void OnModListReceived(int protocolVersion, byte[] data, PlayerId playerId)
         {
             switch (protocolVersion)
             {
-                case > ModListChannelVersion:
+                case > ProtocolVersion:
                 {
                     Internal.LibNetwork.LogWarn(
-                        $"Received a ModList with protocol version {protocolVersion} which is higher than ours ({ModListChannelVersion}). Is there an update? Marking player {playerId} as modded and discarding ModList.");
+                        $"Received a ModList with protocol version {protocolVersion} which is higher than ours ({ProtocolVersion}). Is there an update? Marking player {playerId} as modded and discarding ModList.");
                     RemoteModLists[playerId] = new List<ModdingAPI.ModInformation>();
                     ModListReceived?.Invoke(playerId, new List<ModdingAPI.ModInformation>());
                     break;
                 }
-                case < ModListChannelVersion:
+                case < ProtocolVersion:
                 {
                     Internal.LibNetwork.LogWarn($"Received a ModList with outdated protocol version {protocolVersion} from player {playerId}, applying data migration.");
+                    // add migrations here when updating (de)serializers
                     break;
                 }
                 default:
@@ -125,10 +127,10 @@ namespace Py.LibNetwork
                 RemoteModLists.Remove(player.ID);
         }
 
-        public void OnChannelMessageHandle(string channel, byte[] data, PlayerId sender)
+        public void OnMessageHandle(string channel, byte[] data, PlayerId sender)
         {
-            if (!channel.StartsWith(ModListChannelPrefix)) return;
-            var protocolVersion = Convert.ToInt32(channel[ModListChannelPrefix.Length..]);
+            if (!channel.StartsWith(ChannelPrefix)) return;
+            var protocolVersion = Convert.ToInt32(channel[ChannelPrefix.Length..]);
             OnModListReceived(protocolVersion, data, sender);
         }
 

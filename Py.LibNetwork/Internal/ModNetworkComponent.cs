@@ -14,10 +14,10 @@ namespace Py.LibNetwork.Internal
         [PunRPC]
         private void OnModChannelMessage(string channel, byte[] data, PhotonMessageInfo info)
         {
-            ModNetwork.Instance.InvokeOnChannelMessage(channel, data, info);
+            ModNetwork.Instance.InvokeOnMessage(channel, data, info);
         }
 
-        private void SendChannelMessage(string channel, byte[] data, PlayerId playerId)
+        private void SendMessage(string channel, byte[] data, PlayerId playerId)
         {
             _photonView.RPC(
                 nameof(OnModChannelMessage),
@@ -27,7 +27,7 @@ namespace Py.LibNetwork.Internal
             );
         }
 
-        private void BroadcastChannelMessage(string channel, byte[] data)
+        private void BroadcastMessage(string channel, byte[] data)
         {
             _photonView.RPC(
                 nameof(OnModChannelMessage),
@@ -53,8 +53,8 @@ namespace Py.LibNetwork.Internal
         private void SetupModNetwork()
         {
             var network = ModNetwork.Instance;
-            network.OnBroadcastChannelMessage += BroadcastChannelMessage;
-            network.OnSendChannelMessage += SendChannelMessage;
+            network.OnBroadcastMessage += BroadcastMessage;
+            network.OnSendMessage += SendMessage;
         }
 
         #endregion

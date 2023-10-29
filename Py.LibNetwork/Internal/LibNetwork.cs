@@ -6,6 +6,7 @@ using Utils;
 
 namespace Py.LibNetwork.Internal
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class LibNetwork : DemeoMod
     {
         public override void Load()
@@ -38,7 +39,7 @@ namespace Py.LibNetwork.Internal
             networkController.LocalPlayerLeftRoom += modListHandler.LeftRoomHandle;
             networkController.OtherPlayerJoined += modListHandler.OtherPlayerJoinedHandle;
             networkController.OtherPlayerDisconnected += modListHandler.OtherPlayerLeftHandle;
-            ModNetwork.Instance.OnChannelMessage += modListHandler.OnChannelMessageHandle;
+            ModNetwork.Instance.OnMessage += modListHandler.OnMessageHandle;
 
             modListHandler.ModListReceived += (playerId, mods) =>
             {
