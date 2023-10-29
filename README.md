@@ -28,7 +28,7 @@ and `Py.LibNetwork.dll`
    > [!NOTE]
    > Channel names can be anything, but it's recommended to include basic information such as mod name and a data version.
    > Since theres no mod version enforcement, you may need to apply data migrations.\
-   > See [RemoteModListHandler.cs](Py.LibNetwork/RemoteModListHandler.cs) for a basic example.
+   > See `Py.LibNetwork/RemoteModListHandler.cs` for a basic example.
 
     ```csharp
     using Py.LibNetwork;
