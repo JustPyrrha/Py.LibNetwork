@@ -45,10 +45,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 5.x
-          cache: true
-      
-      - name: Restore .NET Cache
-        run: dotnet restore --locked-mode
       
       - name: Build for ${{ matrix.loader }}
         env:
