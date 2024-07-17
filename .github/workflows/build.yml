@@ -55,4 +55,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Py.LibNetwork.${{ matrix.loader }}.dll
-          path: Py.LibNetwork/bin/netstandard2.1/Py.LibNetwork.${{ matrix.loader }}.dll
+          path: Py.LibNetwork/bin/${{ matrix.loader }}/netstandard2.1/Py.LibNetwork.${{ matrix.loader }}.dll
