@@ -53,7 +53,7 @@ jobs:
       - name: Build for BepInEx
         env:
           DemeoDir: ${{ github.workspace }}/demeo
-        run: dotnet build Py.LibNetwork/Py.LibNetwork.csproj -c BuiltIn -v d
+        run: dotnet build Py.LibNetwork/Py.LibNetwork.csproj -c BepInEx -v d
 
       - name: Upload BepInEx Artifact
         uses: actions/upload-artifact@v4
