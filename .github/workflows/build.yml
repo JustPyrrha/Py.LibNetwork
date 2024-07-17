@@ -9,7 +9,7 @@ on:
 jobs: 
   build:
     name: Build
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         loader:
