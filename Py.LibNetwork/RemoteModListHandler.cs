@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Boardgame;
 using Boardgame.Modding;
 using Boardgame.Networking;
+using JetBrains.Annotations;
+using Py.LibNetwork.Internal;
 
 namespace Py.LibNetwork
 {
@@ -10,13 +13,14 @@ namespace Py.LibNetwork
     /// Example <see cref="ModNetwork"/> usage.
     /// You can also use <see cref="RemoteModLists"/> in your mods to determine if a remote client is modded.
     /// </summary>
-    public class RemoteModListHandler
+    [PublicAPI]
+    public class RemoteModListHandler(GameContext context)
     {
         private const string ChannelPrefix = "Py.LibNetwork/ModList/";
         // bump version here when updating (de)serializers
         private const int ProtocolVersion = 0;
 
-        public static Dictionary<PlayerId, List<ModdingAPI.ModInformation>> RemoteModLists = new();
+        public static readonly Dictionary<PlayerId, List<ModdingAPI.ModInformation>> RemoteModLists = new();
         public event Action<PlayerId, List<ModdingAPI.ModInformation>> ModListReceived;
 
         #region (De)Serialization
@@ -82,15 +86,16 @@ namespace Py.LibNetwork
             {
                 case > ProtocolVersion:
                 {
-                    Internal.LibNetwork.LogWarn(
-                        $"Received a ModList with protocol version {protocolVersion} which is higher than ours ({ProtocolVersion}). Is there an update? Marking player {playerId} as modded and discarding ModList.");
-                    RemoteModLists[playerId] = new List<ModdingAPI.ModInformation>();
-                    ModListReceived?.Invoke(playerId, new List<ModdingAPI.ModInformation>());
+                    ModLog.LogWarn(
+                        $"Received a ModList with protocol version {protocolVersion} which is higher than ours ({ProtocolVersion}). Is there an update? Marking player {NetworkHelper.TryResolvePlayerName(context, playerId)} as modded and discarding ModList.");
+                    RemoteModLists[playerId] = [];
+                    ModListReceived?.Invoke(playerId, []);
                     break;
                 }
                 case < ProtocolVersion:
                 {
-                    Internal.LibNetwork.LogWarn($"Received a ModList with outdated protocol version {protocolVersion} from player {playerId}, applying data migration.");
+                    ModLog.LogWarn(
+                        $"Received a ModList with outdated protocol version {protocolVersion} from player {NetworkHelper.TryResolvePlayerName(context, playerId)}, applying data migration.");
                     // add migrations here when updating (de)serializers
                     break;
                 }

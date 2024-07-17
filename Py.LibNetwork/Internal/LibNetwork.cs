@@ -1,39 +1,57 @@
-﻿using Boardgame.Modding;
-using Boardgame.Networking;
+﻿using Boardgame;
 using Photon.Pun;
 using UnityEngine;
-using Utils;
 
 namespace Py.LibNetwork.Internal
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class LibNetwork : DemeoMod
+    public static class LibNetworkMeta
     {
-        public override void Load()
-        {
-            SetupModPhotonView();
-            SetupModListHandler(gameContext.networkController);
-        }
+        public const string Name = "Py.LibNetwork";
+        public const string Version = "1.1.0";
+        public const string Author = "JustPyrrha";
+        public const string Description = "Networking utilities for mod developers.";
+        public const string Repo = "https://github.com/JustPyrrha/Py.LibNetwork";
+        public const bool NetworkCompatible = true;
+    }
 
-        public override ModdingAPI.ModInformation ModInformation { get; } = new()
+    public class LibNetwork(GameContext gameContext)
+    {
+        public void Load()
         {
-            name = "Py.LibNetwork",
-            version = "1.0.0",
-            author = "JustPyrrha",
-            description = "Networking utilities for mod developers.",
-            isNetworkCompatible = true
-        };
+#if LOADER_BEPINEX || LOADER_MELON
+            // There currently exists a bug that will prevent the game from loading
+            // with mods added to the modding api because the modding menu prefab isn't set.
+            if (gameContext.commonRegistry.moddingMenuPrefab != null)
+            {
+                if (ModdingAPI.GetInstalledMods().All(it => it.name != LibNetworkMeta.Name))
+                {
+                    ModdingAPI.ExternallyInstalledMods.Add(new ModdingAPI.ModInformation
+                    {
+                        name = LibNetworkMeta.Name,
+                        version = LibNetworkMeta.Version,
+                        author = LibNetworkMeta.Author,
+                        description = LibNetworkMeta.Description,
+                        isNetworkCompatible = LibNetworkMeta.NetworkCompatible
+                    });
+                }
+            }
+#endif
+
+            SetupModPhotonView();
+            SetupModListHandler();
+        }
 
         private void SetupModPhotonView()
         {
-            var gameObject = new GameObject("Py.LibNetwork");
+            var gameObject = new GameObject(LibNetworkMeta.Name);
             gameObject.AddComponent<PhotonView>();
             gameObject.AddComponent<ModNetworkComponent>();
         }
 
-        private void SetupModListHandler(INetworkController networkController)
+        private void SetupModListHandler()
         {
-            var modListHandler = new RemoteModListHandler();
+            var modListHandler = new RemoteModListHandler(gameContext);
+            var networkController = gameContext.networkController;
 
             networkController.JoinedRoom += modListHandler.JoinedRoomHandle;
             networkController.LocalPlayerLeftRoom += modListHandler.LeftRoomHandle;
@@ -45,24 +63,30 @@ namespace Py.LibNetwork.Internal
             {
                 if (mods.Count > 0)
                 {
-                    Log(
-                        $"Received a ModList with {mods.Count} mods from player {playerId}");
+                    ModLog.Log(
+                        "Received a ModList with {0} mods from player {1}.",
+                        mods.Count,
+                        NetworkHelper.TryResolvePlayerName(gameContext, playerId)
+                    );
                     foreach (var mod in mods)
                     {
-                        Log(
-                            $"    {mod.name} v{mod.version} by {mod.author} (network compatible? {(mod.isNetworkCompatible ? "yes" : "no")})");
+                        ModLog.Log(
+                            "    {0} v{1} by {2}. (Network Compatible? {3})",
+                            mod.name,
+                            mod.version,
+                            mod.author,
+                            mod.isNetworkCompatible ? "Y" : "N"
+                        );
                     }
                 }
                 else
                 {
-                    Log($"Received an empty ModList from {playerId}.");
+                    ModLog.Log(
+                        "Received an empty ModList from {0}.",
+                        NetworkHelper.TryResolvePlayerName(gameContext, playerId)
+                    );
                 }
             };
         }
-
-        private const string LogPrefix = "Py.LibNetwork";
-        internal static void Log(string message) => DemeoLog.Log(LogPrefix, message);
-        internal static void LogWarn(string message) => DemeoLog.LogWarn(LogPrefix, message);
-        internal static void LogError(string message) => DemeoLog.LogError(LogPrefix, message);
     }
 }

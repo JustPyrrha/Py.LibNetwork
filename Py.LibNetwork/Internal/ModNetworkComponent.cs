@@ -7,7 +7,12 @@ namespace Py.LibNetwork.Internal
     [DisallowMultipleComponent]
     internal class ModNetworkComponent : MonoBehaviour
     {
-        private PhotonView _photonView;
+        private readonly PhotonView _photonView;
+
+        public ModNetworkComponent()
+        {
+            _photonView = PhotonView.Get(this);
+        }
 
         #region Network Methods
 
@@ -43,7 +48,6 @@ namespace Py.LibNetwork.Internal
         
         private void SetupPhoton()
         {
-            _photonView = PhotonView.Get(this);
             _photonView.ViewID = 900; // 0-999, we'll use a high view id to avoid conflicts with vanilla.
             _photonView.OwnershipTransfer = OwnershipOption.Request;
             _photonView.Synchronization = ViewSynchronization.UnreliableOnChange;

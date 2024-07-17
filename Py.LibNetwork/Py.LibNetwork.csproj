@@ -2,35 +2,63 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
-        <Nullable>disable</Nullable>
-        <LangVersion>10</LangVersion>
-        <DemeoDir Condition=" '$(DemeoDir)' == '' ">C:\Program Files (x86)\Steam\steamapps\common\Demeo</DemeoDir>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <DemeoDir Condition=" '$(DemeoDir)'=='' ">V:\SteamLibrary\steamapps\common\Demeo</DemeoDir>
+        <ModName Condition=" '$(ModName)'=='' ">Py.LibNetwork</ModName>
+        <Configurations>BuiltIn;BepInEx;MelonLoader</Configurations>
+        <AssemblySearchPaths>$(DemeoDir)\demeo_Data\Managed;$(AssemblySearchPaths)</AssemblySearchPaths>
+        <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     </PropertyGroup>
-
+    
+    <!-- Built-in Loader Configuration -->
+    <PropertyGroup Condition=" '$(Configuration)'=='BuiltIn' ">
+        <DefineConstants>LOADER_BUILTIN</DefineConstants>
+        <AssemblyName>$(ModName).$(Configuration)</AssemblyName>
+    </PropertyGroup>
+    
+    <!-- BepInEx Loader Configuration -->
+    <PropertyGroup Condition=" '$(Configuration)'=='BepInEx' ">
+        <DefineConstants>LOADER_BEPINEX</DefineConstants>
+        <AssemblyName>$(ModName).$(Configuration)</AssemblyName>
+    </PropertyGroup>
+    <ItemGroup Condition=" '$(Configuration)'=='BepInEx' ">
+        <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
+        <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
+    </ItemGroup>
+    
+    <!-- MelonLoader Configuration -->
+    <PropertyGroup Condition=" '$(Configuration)'=='MelonLoader' ">
+        <DefineConstants>LOADER_MELON</DefineConstants>
+        <AssemblyName>$(ModName).$(Configuration)</AssemblyName>
+    </PropertyGroup>
+    <ItemGroup Condition=" '$(Configuration)'=='MelonLoader' ">
+        <PackageReference Include="HarmonyX" Version="2.10.1" IncludeAssets="compile" />
+        <PackageReference Include="LavaGang.MelonLoader" Version="0.6.4" IncludeAssets="compile" />
+    </ItemGroup>
+    
+    <!-- Common dependencies, used by all loaders. -->
     <ItemGroup>
-        <Reference Include="Assembly-CSharp">
-            <HintPath>$(DemeoDir)\demeo_Data\Managed\Assembly-CSharp.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.CoreModule">
-            <HintPath>$(DemeoDir)\demeo_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-        </Reference>
-        <Reference Include="ResolutionGames.Singleton">
-            <HintPath>$(DemeoDir)\demeo_Data\Managed\ResolutionGames.Singleton.dll</HintPath>
-        </Reference>
+        <PackageReference Include="UnityEngine.Modules" Version="2021.3.27" IncludeAssets="compile" />
         
-        <!-- Photon Networking Dependencies -->
+        <!-- Demeo itself -->
+        <Reference Include="Assembly-CSharp">
+            <Private>false</Private>
+        </Reference>
+        <!-- RG's singleton library -->
+        <Reference Include="ResolutionGames.Singleton">
+            <Private>false</Private>
+        </Reference>
+        <!-- Photon networking libraries -->
         <Reference Include="Photon3Unity3D">
-            <HintPath>$(DemeoDir)\demeo_Data\Managed\Photon3Unity3D.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="PhotonRealtime">
-            <HintPath>$(DemeoDir)\demeo_Data\Managed\PhotonRealtime.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="PhotonUnityNetworking">
-            <HintPath>$(DemeoDir)\demeo_Data\Managed\PhotonUnityNetworking.dll</HintPath>
+            <Private>false</Private>
         </Reference>
     </ItemGroup>
-
-    <Target Name="CopyOutputFileToDemeoDir" AfterTargets="Build">
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(DemeoDir)\DemeoMods\$(AssemblyName)" />
-    </Target>
 </Project>

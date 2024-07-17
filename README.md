@@ -12,7 +12,7 @@ and extract it into your Demeo game folder.
 
 You should have a folder structure that looks like this:
 ```
-Demeo (or Demeo - PC Edition)/
+Demeo/
 ├─ DemeoMods/
 │  ├─ Py.LibNetwork/
 │  │  ├─ Py.LibNetwork.dll
@@ -26,8 +26,8 @@ and `Py.LibNetwork.dll`
 ### Usage
 1. Add an event handler.
    > [!NOTE]
-   > Channel names can be anything, but it's recommended to include basic information such as mod name and a data version.
-   > Since theres no mod version enforcement, you may need to apply data migrations.\
+   > Channel names can be anything, but it's recommended to include basic information such as mod name and a data version.\
+   > Since there's no mod version enforcement, you may need to apply data migrations.\
    > See `Py.LibNetwork/RemoteModListHandler.cs` for a basic example.
 
     ```csharp
