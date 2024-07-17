@@ -1,6 +1,10 @@
 ﻿using Boardgame;
 using Photon.Pun;
 using UnityEngine;
+#if LOADER_BEPINEX || LOADER_MELON
+using System.Linq;
+using Boardgame.Modding;
+#endif
 
 namespace Py.LibNetwork.Internal
 {
