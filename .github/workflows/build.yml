@@ -10,13 +10,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      matrix:
-        loader:
-          - BuiltIn
-          - BepInEx
-          - MelonLoader
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,13 +39,35 @@ jobs:
         with:
           dotnet-version: 5.x
       
-      - name: Build for ${{ matrix.loader }}
+      - name: Build for BuiltIn
         env:
           DemeoDir: ${{ github.workspace }}/demeo
-        run: dotnet build Py.LibNetwork/Py.LibNetwork.csproj -c ${{ matrix.loader }} -v d
+        run: dotnet build Py.LibNetwork/Py.LibNetwork.csproj -c BuiltIn -v d
         
-      - name: Upload ${{ matrix.loader }} Artifact
+      - name: Upload BuiltIn Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Py.LibNetwork.${{ matrix.loader }}.dll
-          path: Py.LibNetwork/bin/${{ matrix.loader }}/netstandard2.1/Py.LibNetwork.${{ matrix.loader }}.dll
+          name: Py.LibNetwork.BuiltIn.dll
+          path: Py.LibNetwork/bin/BuiltIn/netstandard2.1/Py.LibNetwork.BuiltIn.dll
+          
+      - name: Build for BepInEx
+        env:
+          DemeoDir: ${{ github.workspace }}/demeo
+        run: dotnet build Py.LibNetwork/Py.LibNetwork.csproj -c BuiltIn -v d
+
+      - name: Upload BepInEx Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Py.LibNetwork.BepInEx.dll
+          path: Py.LibNetwork/bin/BepInEx/netstandard2.1/Py.LibNetwork.BepInEx.dll
+          
+      - name: Build for MelonLoader
+        env:
+          DemeoDir: ${{ github.workspace }}/demeo
+        run: dotnet build Py.LibNetwork/Py.LibNetwork.csproj -c MelonLoader -v d
+
+      - name: Upload MelonLoader Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Py.LibNetwork.MelonLoader.dll
+          path: Py.LibNetwork/bin/MelonLoader/netstandard2.1/Py.LibNetwork.MelonLoader.dll
