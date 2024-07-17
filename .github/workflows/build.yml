@@ -55,7 +55,7 @@ jobs:
         run: dotnet build Py.LibNetwork/Py.LibNetwork.csproj -c ${{ matrix.loader }} -v d
         
       - name: Upload ${{ matrix.loader }} Artifact
-        uses: actions/upload-artifact@4
+        uses: actions/upload-artifact@v4
         with:
           name: Py.LibNetwork.${{ matrix.loader }}.dll
           path: Py.LibNetwork/bin/netstandard2.1/Py.LibNetwork.${{ matrix.loader }}.dll
