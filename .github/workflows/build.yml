@@ -1,0 +1,61 @@
+﻿name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs: 
+  build:
+    name: Build
+    runs-on: ubuntu
+    strategy:
+      matrix:
+        loader:
+          - BuiltIn
+          - BepInEx
+          - MelonLoader
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Cache Demeo
+        id: demeo-cache
+        uses: actions/cache@v4
+        with:
+          path: demeo
+          # demeo-version is pulled from Boardgame.Version.ChangeNo
+          key: demeo-${{ hashFiles('demeo-version') }}
+        
+      - name: Setup SteamCMD
+        if: steps.demeo-cache.outputs.cache-hit != 'true'
+        uses: CyberAndrii/setup-steamcmd@v1
+        
+      - name: Setup Steam Guard
+        if: steps.demeo-cache.outputs.cache-hit != 'true'
+        run: echo "${{ secrets.STEAM_CI_CONFIG }}" | base64 -d > ~/Steam/config/config.vdf
+          
+      - name: Install Demeo
+        if: steps.demeo-cache.outputs.cache-hit != 'true'
+        run: steamcmd +@sSteamCmdForcePlatformType windows +force_install_dir ${{ github.workspace }}/demeo +login ${{ secrets.STEAM_CI_USER }} +app_update 1484280 validate +quit
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 5.x
+          cache: true
+      
+      - name: Restore .NET Cache
+        run: dotnet restore --locked-mode
+      
+      - name: Build for ${{ matrix.loader }}
+        env:
+          DemeoDir: ${{ github.workspace }}/demeo
+        run: dotnet build Py.LibNetwork/Py.LibNetwork.csproj -c ${{ matrix.loader }} -v d
+        
+      - name: Upload ${{ matrix.loader }} Artifact
+        uses: actions/upload-artifact@4
+        with:
+          name: Py.LibNetwork.${{ matrix.loader }}.dll
+          path: Py.LibNetwork/bin/netstandard2.1/Py.LibNetwork.${{ matrix.loader }}.dll
